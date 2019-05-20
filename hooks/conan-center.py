@@ -147,6 +147,7 @@ def pre_export(output, conanfile, conanfile_path, reference, **kwargs):
         for path, dirs, files in os.walk(dir_path):
             if os.path.join("test_package", "build") in path:
                 continue
+            dirs[:] = [d for d in dirs if d not in [".conan"]]  # Discard the generated .conan directory
             for files_it in files:
                 file_path = os.path.join(path, files_it)
                 total_size += os.path.getsize(file_path)
@@ -261,6 +262,8 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
 
     @run_test("CMAKE MODULES/PC-FILES", output)
     def test(out):
+        if conanfile.name == "cmake":
+            return
         bad_files = _get_files_following_patterns(conanfile.package_folder, ["*Config.cmake",
                                                                              "*Targets.cmake",
                                                                              "Find*.cmake",
