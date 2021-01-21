@@ -406,11 +406,7 @@ class ConanCenterTests(ConanClientTestCase):
 
         tools.save('conanfile.py', content=conanfile)
         output = self.conan(['create', '.', 'package/version@conan/test'])
-        if platform.system() == "Windows":
-            self.assertNotIn("[FPIC MANAGEMENT (KB-H007)] OK", output)
-        else:
-            self.assertIn("[FPIC MANAGEMENT (KB-H007)] OK. 'fPIC' option found and apparently well "
-                          "managed", output)
+        self.assertIn("[FPIC MANAGEMENT (KB-H007)] OK", output)
 
     def test_conanfile_cppstd(self):
         content = textwrap.dedent("""\

@@ -687,7 +687,7 @@ def pre_build(output, conanfile, **kwargs):
     @run_test("KB-H007", output)
     def test(out):
         has_fpic = conanfile.options.get_safe("fPIC")
-        if conanfile.settings.get_safe("os") == "Windows" and has_fpic:
+        if conanfile.settings.get_safe("os") == "Windows" and has_fpic and not hasattr(conanfile, "validate"):
             out.error("'fPIC' option not managed correctly. Please remove it for Windows "
                       "configurations: del self.options.fpic")
         elif has_fpic:
@@ -735,7 +735,7 @@ def post_package(output, conanfile, conanfile_path, **kwargs):
     def test(out):
         if conanfile.version == "system":
             return
-        
+
         # INFO: Whitelist for package names
         if conanfile.name in ["ms-gsl", "cccl", "poppler-data", "extra-cmake-modules", "gnu-config", "autoconf", "automake"]:
             return
