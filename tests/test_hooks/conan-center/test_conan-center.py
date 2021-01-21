@@ -385,6 +385,33 @@ class ConanCenterTests(ConanClientTestCase):
             self.assertIn("[FPIC MANAGEMENT (KB-H007)] OK. 'fPIC' option found and apparently well "
                           "managed", output)
 
+    def test_fpic_with_validate(self):
+        conanfile = textwrap.dedent("""\
+                from conans import ConanFile
+                from conans.errors import ConanInvalidConfiguration
+
+                class FoobarConan(ConanFile):
+                    settings = "os"
+                    options = {"fPIC": [True, False], "shared": [True, False]}
+                    default_options = {"fPIC": True, "shared": False}
+
+                    def configure(self):
+                        if self.options.shared:
+                            del self.options.fPIC
+
+                    def validate(self):
+                        if self.settings.os != "Windows":
+                            raise ConanInvalidConfiguration("Window only")
+                """)
+
+        tools.save('conanfile.py', content=conanfile)
+        output = self.conan(['create', '.', 'package/version@conan/test'])
+        if platform.system() == "Windows":
+            self.assertNotIn("[FPIC MANAGEMENT (KB-H007)] OK", output)
+        else:
+            self.assertIn("[FPIC MANAGEMENT (KB-H007)] OK. 'fPIC' option found and apparently well "
+                          "managed", output)
+
     def test_conanfile_cppstd(self):
         content = textwrap.dedent("""\
         from conans import ConanFile
